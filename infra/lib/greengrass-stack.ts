@@ -255,6 +255,16 @@ export class GreengrassStack extends cdk.Stack {
                 resources: ['sitesense/*'],
               },
             },
+            'aws.greengrass.ipc.pubsub': {
+              'com.project-aegis.publisher:pubsub:1': {
+                policyDescription: 'Local Greengrass pub/sub for inter-component messaging',
+                operations: [
+                  'aws.greengrass#PublishToTopic',
+                  'aws.greengrass#SubscribeToTopic',
+                ],
+                resources: ['*'],
+              },
+            },
           },
         },
       },

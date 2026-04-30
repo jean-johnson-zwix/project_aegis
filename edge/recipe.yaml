@@ -27,8 +27,10 @@ ComponentConfiguration:
   DefaultConfiguration:
     publishIntervalSeconds: "60"
     bufferDbPath: /greengrass/v2/work/com.project-aegis.publisher/buffer.db
-    # IPC access control — allows this component to publish to IoT Core via MQTT proxy.
-    # Resources follow the MQTT topic filter for CRAC telemetry.
+    # cracUnits: loaded from crac_units.yaml artifact (co-located with publisher.py via CONFIG_DIR).
+    # Using a YAML file rather than a flat config param supports nested unit attributes.
+    # IPC access control — allows this component to publish to IoT Core via MQTT proxy
+    # and to use local Greengrass pub/sub for inter-component messaging.
     accessControl:
       aws.greengrass.ipc.mqttproxy:
         "com.project-aegis.publisher:mqttproxy:1":
@@ -37,6 +39,14 @@ ComponentConfiguration:
             - aws.greengrass#PublishToIoTCore
           resources:
             - "sitesense/*"
+      aws.greengrass.ipc.pubsub:
+        "com.project-aegis.publisher:pubsub:1":
+          policyDescription: "Local Greengrass pub/sub for inter-component messaging"
+          operations:
+            - aws.greengrass#PublishToTopic
+            - aws.greengrass#SubscribeToTopic
+          resources:
+            - "*"
 
 Manifests:
   - Platform:

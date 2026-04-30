@@ -24,6 +24,7 @@ RUN dnf update -y && \
         shadow-utils \
         procps-ng \
         which \
+        sqlite \
     && dnf clean all
 
 # Bootstrap pip for Python 3.11 and wire up default python3/pip3 symlinks
