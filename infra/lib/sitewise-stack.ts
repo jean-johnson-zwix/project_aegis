@@ -114,7 +114,36 @@ export class SiteWiseStack extends cdk.Stack {
   private buildCRACUnitModel(): iotsitewise.CfnAssetModel {
     return new iotsitewise.CfnAssetModel(this, 'CRACUnitModel', {
       assetModelName: 'CRACUnitModel',
-      assetModelDescription: 'CRAC unit — attributes, measurements (Input Registers), transforms, and metrics',
+      assetModelDescription: 'CRAC unit — attributes, measurements (Input Registers), transforms, metrics, and alarms',
+      assetModelCompositeModels: [
+        // External alarms — state is written by the alarm_evaluator Lambda via BatchPutAssetPropertyValue.
+        // SiteWise emits an EventBridge "IoT SiteWise Alarm State Changed" event on every state transition,
+        // which triggers the diagnostic Lambda.
+        {
+          name: 'HighSupplyTempAlarm',
+          type: 'AWS/ALARM',
+          compositeModelProperties: [
+            { name: 'AWS/ALARM_TYPE',  logicalId: 'HighSupplyTempAlarmType',  dataType: 'STRING', type: { typeName: 'Attribute', attribute: { defaultValue: 'EXTERNAL' } } },
+            { name: 'AWS/ALARM_STATE', logicalId: 'HighSupplyTempAlarmState', dataType: 'STRUCT', dataTypeSpec: 'AWS/ALARM_STATE', type: { typeName: 'Measurement' } },
+          ],
+        },
+        {
+          name: 'FanFailureAlarm',
+          type: 'AWS/ALARM',
+          compositeModelProperties: [
+            { name: 'AWS/ALARM_TYPE',  logicalId: 'FanFailureAlarmType',  dataType: 'STRING', type: { typeName: 'Attribute', attribute: { defaultValue: 'EXTERNAL' } } },
+            { name: 'AWS/ALARM_STATE', logicalId: 'FanFailureAlarmState', dataType: 'STRUCT', dataTypeSpec: 'AWS/ALARM_STATE', type: { typeName: 'Measurement' } },
+          ],
+        },
+        {
+          name: 'EfficiencyDegradationAlarm',
+          type: 'AWS/ALARM',
+          compositeModelProperties: [
+            { name: 'AWS/ALARM_TYPE',  logicalId: 'EfficiencyDegradationAlarmType',  dataType: 'STRING', type: { typeName: 'Attribute', attribute: { defaultValue: 'EXTERNAL' } } },
+            { name: 'AWS/ALARM_STATE', logicalId: 'EfficiencyDegradationAlarmState', dataType: 'STRUCT', dataTypeSpec: 'AWS/ALARM_STATE', type: { typeName: 'Measurement' } },
+          ],
+        },
+      ],
       assetModelProperties: [
 
         // --- Attributes (static metadata) ---
@@ -178,6 +207,13 @@ export class SiteWiseStack extends cdk.Stack {
             },
           },
         },
+
+        // --- Alarm threshold attributes ---
+        // Used by external alarm evaluator Lambda to determine alarm conditions.
+        // HighSupplyTemp fires when supply_temp_c > alarm_supply_temp_threshold_c (default 21°C = target 18 + 3).
+        { logicalId: 'alarm_supply_temp_threshold_c', name: 'alarm_supply_temp_threshold_c', dataType: 'DOUBLE', unit: '°C', type: { typeName: 'Attribute', attribute: { defaultValue: '21.0' } } },
+        // EfficiencyDegradation fires when cooling_efficiency (delta_t / power_draw_kw) falls below this.
+        { logicalId: 'alarm_efficiency_threshold', name: 'alarm_efficiency_threshold', dataType: 'DOUBLE', unit: '°C/kW', type: { typeName: 'Attribute', attribute: { defaultValue: '0.3' } } },
 
         // --- Metrics (aggregated over tumbling time windows) ---
         {
