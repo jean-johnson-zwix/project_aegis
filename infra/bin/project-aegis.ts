@@ -3,6 +3,7 @@ import 'source-map-support/register';
 import * as cdk from 'aws-cdk-lib';
 import { SiteWiseStack } from '../lib/sitewise-stack';
 import { IotStack } from '../lib/iot-stack';
+import { GreengrassStack } from '../lib/greengrass-stack';
 
 const app = new cdk.App();
 
@@ -20,4 +21,10 @@ new IotStack(app, 'ProjectAegisIotStack', {
   env,
   description: 'Project Aegis — IoT Things and routing rule to SiteWise',
   siteId: siteWiseStack.siteId,
+});
+
+new GreengrassStack(app, 'ProjectAegisGreengrassStack', {
+  env,
+  description:
+    'Project Aegis — Greengrass V2 core device, token exchange role, component version, and deployment',
 });
