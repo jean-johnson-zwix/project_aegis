@@ -4,6 +4,7 @@ import * as cdk from 'aws-cdk-lib';
 import { SiteWiseStack } from '../lib/sitewise-stack';
 import { IotStack } from '../lib/iot-stack';
 import { GreengrassStack } from '../lib/greengrass-stack';
+import { DiagnosticStack } from '../lib/diagnostic-stack';
 
 const app = new cdk.App();
 
@@ -27,4 +28,10 @@ new GreengrassStack(app, 'ProjectAegisGreengrassStack', {
   env,
   description:
     'Project Aegis — Greengrass V2 core device, token exchange role, component version, and deployment',
+});
+
+new DiagnosticStack(app, 'ProjectAegisDiagnosticStack', {
+  env,
+  description:
+    'Project Aegis — Alarm evaluator, Nova Lite diagnostic Lambda, DynamoDB diagnostics table, EventBridge rule',
 });
