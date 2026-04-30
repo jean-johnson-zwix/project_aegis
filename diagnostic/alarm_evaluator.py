@@ -122,7 +122,7 @@ def handler(event: dict, context) -> None:
     # (that event type is for IoT Events-backed alarms only). We emit an
     # equivalent custom event from the same structure so handler.py is unchanged.
     try:
-        EVENTS.put_events(entries=[{
+        response = EVENTS.put_events(Entries=[{
             'Source': 'project-aegis.alarms',
             'DetailType': 'IoT SiteWise Alarm State Changed',
             'Detail': json.dumps({
@@ -134,6 +134,9 @@ def handler(event: dict, context) -> None:
             }),
             'EventBusName': 'default',
         }])
+        if response.get('FailedEntryCount', 0):
+            logger.error('EventBridge put_events failed entries: %s', response.get('Entries'))
+            raise RuntimeError('EventBridge put_events reported failed entries')
         logger.info('EventBridge alarm event emitted for asset %s alarm %s', asset_id, alarm_name)
     except Exception:
         logger.exception('Failed to emit EventBridge event')
