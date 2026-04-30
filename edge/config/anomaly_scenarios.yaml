@@ -1,0 +1,40 @@
+# Anomaly injection scenarios for demo and testing.
+# Usage: pass scenario name to modbus_sim.next_reading(unit, scenario='FanFailure')
+# Each scenario overrides specific fields in the generated reading.
+# Normal generation applies to all unspecified fields.
+
+scenarios:
+
+  HighSupplyTemp:
+    description: >
+      Supply temperature rises well above the 18°C setpoint.
+      Triggers the HighSupplyTemp alarm when p95_supply_temp_1h > target_supply_temp_c + 3.
+    overrides:
+      supply_temp_c: 25.5
+      return_temp_c: 34.0   # delta_t still reasonable — the supply air itself is hot
+    demo_note: "Run for ~5 min at publishIntervalSeconds=5 to accumulate enough samples for p95 metric"
+
+  FanFailure:
+    description: >
+      Fan RPM drops to zero while power draw remains elevated — motor seized or belt snapped.
+      Triggers FanFailure alarm (fan_rpm < 100 AND power_draw_kw > 1).
+      Also sets fan_stall_suspect flag in validator.py.
+    overrides:
+      fan_rpm: 0.0
+      power_draw_kw: 11.5   # compressor still running, no airflow
+    demo_note: "Triggers within one publish cycle — fastest demo alarm"
+
+  EfficiencyDegradation:
+    description: >
+      delta_t collapses (return_temp nearly equals supply_temp) while power stays high.
+      Indicates refrigerant leak, fouled coil, or blocked airflow.
+      Triggers EfficiencyDegradation alarm (cooling_efficiency < historical_avg * 0.7).
+    overrides:
+      supply_temp_c: 19.8
+      return_temp_c: 21.0   # delta_t = 1.2°C vs normal ~10°C
+      power_draw_kw: 44.0   # still consuming full power
+    demo_note: "Requires historical_avg baseline to have accumulated (~1h normal operation)"
+
+  Normal:
+    description: "Explicitly cancel any active scenario and return to normal generation."
+    overrides: {}

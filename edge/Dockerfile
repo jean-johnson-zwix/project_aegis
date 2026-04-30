@@ -23,6 +23,7 @@ RUN dnf update -y && \
         sudo \
         shadow-utils \
         procps-ng \
+        which \
     && dnf clean all
 
 # Bootstrap pip for Python 3.11 and wire up default python3/pip3 symlinks

@@ -1,0 +1,42 @@
+# greengrass-config.yaml.template — Initial Greengrass V2 nucleus configuration
+#
+# Usage:
+#   Copy this file to edge/config/greengrass-config.yaml and replace all
+#   <REPLACE_ME_*> placeholders with values from your AWS environment.
+#   Run `scripts/provision-greengrass.sh` to do this automatically.
+#
+# DO NOT commit edge/config/greengrass-config.yaml — it contains endpoint URLs
+# that are specific to your account. Only this template is committed.
+
+---
+system:
+  certificateFilePath: "/tmp/certs/device.pem.crt"
+  privateKeyPath: "/tmp/certs/private.pem.key"
+  rootCaPath: "/tmp/certs/AmazonRootCA1.pem"
+  rootpath: "/greengrass/v2"
+  thingName: "project-aegis-greengrass-core"
+
+services:
+  aws.greengrass.Nucleus:
+    version: "2.13.0"
+    configuration:
+      awsRegion: "us-west-2"
+      iotRoleAlias: "ProjectAegisGreengrassTokenExchangeAlias"
+      # Get these from: aws iot describe-endpoint --endpoint-type <type>
+      iotDataEndpoint: "<REPLACE_ME_IOT_DATA_ENDPOINT>"      # e.g. abc123xyz-ats.iot.us-west-2.amazonaws.com
+      iotCredEndpoint: "<REPLACE_ME_IOT_CRED_ENDPOINT>"      # e.g. xyz789abc.credentials.iot.us-west-2.amazonaws.com
+      logging:
+        level: INFO
+        format: TEXT
+        outputType: FILE
+        fileSizeKB: 1024
+        totalLogsSizeKB: 10240
+
+  # Greengrass CLI — required by scripts/deploy-component.ps1.
+  # The nucleus downloads and installs this component on first boot.
+  # AuthorizedPosixGroups: "root" allows the container's root process to call
+  # the CLI IPC socket (creates /greengrass/v2/cli_ipc_info/group-0).
+  aws.greengrass.Cli:
+    version: "2.13.0"
+    configuration:
+      AuthorizedPosixGroups: "root"

@@ -1,0 +1,21 @@
+# IoT device certificates — never commit
+certs/
+
+# Populated greengrass config (contains endpoint URLs)
+config/greengrass-config.yaml
+
+# Greengrass runtime data if running outside Docker
+greengrass/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# SQLite buffer (local dev)
+*.db
+*.db-shm
+*.db-wal
+
+# Greengrass local deployment staging dirs (created by deploy-component.sh)
+recipes/

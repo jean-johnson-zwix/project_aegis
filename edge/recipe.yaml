@@ -1,0 +1,68 @@
+# recipe.yaml — Greengrass V2 component recipe
+# Component: com.project-aegis.publisher  Version: 1.0.0
+#
+# This file is used for LOCAL deployment via greengrass-cli (scripts/deploy-component.sh).
+# For CLOUD deployment, the recipe is embedded inline in infra/lib/greengrass-stack.ts
+# and artifacts are served from S3.
+#
+# Artifacts are pre-placed by scripts/deploy-component.ps1 (docker cp) into the
+# --artifactDir path; no Artifacts section is needed in the recipe (file: URIs
+# were dropped in Greengrass 2.9+).
+
+---
+RecipeFormatVersion: "2020-01-25"
+ComponentName: com.project-aegis.publisher
+ComponentVersion: "1.0.0"
+ComponentDescription: >-
+  CRAC telemetry publisher: Modbus register simulator, edge-side range validation,
+  SQLite offline buffer with replay. Publishes to IoT Core via Greengrass IPC MQTT proxy.
+ComponentPublisher: project-aegis
+
+ComponentDependencies:
+  aws.greengrass.Nucleus:
+    VersionRequirement: ">=2.9.0"
+    DependencyType: SOFT
+
+ComponentConfiguration:
+  DefaultConfiguration:
+    publishIntervalSeconds: "60"
+    bufferDbPath: /greengrass/v2/work/com.project-aegis.publisher/buffer.db
+    # IPC access control — allows this component to publish to IoT Core via MQTT proxy.
+    # Resources follow the MQTT topic filter for CRAC telemetry.
+    accessControl:
+      aws.greengrass.ipc.mqttproxy:
+        "com.project-aegis.publisher:mqttproxy:1":
+          policyDescription: "Publish CRAC telemetry readings to IoT Core"
+          operations:
+            - aws.greengrass#PublishToIoTCore
+          resources:
+            - "sitesense/*"
+
+Manifests:
+  - Platform:
+      os: linux
+    Lifecycle:
+      Install:
+        # Install Python dependencies. RequiresPrivilege: true so pip runs as
+        # root rather than ggc_user (who has no home dir, causing pip cache errors).
+        Script: pip3 install -r {artifacts:path}/requirements.txt --quiet
+        RequiresPrivilege: true
+        Timeout: 120
+
+      Run:
+        # Inject component configuration as environment variables so publisher.py
+        # can read them without parsing Greengrass IPC config APIs.
+        # CONFIG_DIR={artifacts:path} ensures yaml files (co-located artifacts)
+        # are found at runtime without hardcoded paths.
+        Script: |
+          export PUBLISH_INTERVAL_SECONDS={configuration:/publishIntervalSeconds}
+          export BUFFER_DB_PATH={configuration:/bufferDbPath}
+          export CONFIG_DIR={artifacts:path}
+          python3 -u {artifacts:path}/publisher.py
+        RequiresPrivilege: false
+
+    # No Artifacts section for local development. Greengrass 2.9+ dropped support
+    # for the "file:" URI scheme. When greengrass-cli is invoked with --artifactDir,
+    # {artifacts:path} automatically resolves to:
+    #   <artifactDir>/<ComponentName>/<ComponentVersion>/
+    # Files are pre-placed there by scripts/deploy-component.ps1 via docker cp.

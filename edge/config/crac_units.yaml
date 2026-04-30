@@ -1,0 +1,58 @@
+# CRAC unit configuration — loaded by publisher.py and modbus_sim.py
+# Each entry maps directly to a SiteWise asset instance.
+
+site_id: phx-dc-01
+
+units:
+  - unit_id: crac-A1
+    hall_id: hall-A
+    manufacturer: Liebert
+    model_number: DS060
+    install_date: "2021-03-15"
+    max_cooling_kw: 60.0
+    # Baseline operating parameters (used by modbus_sim for realistic generation)
+    baseline:
+      supply_temp_c: 18.0
+      delta_t_c: 10.0       # typical return_temp - supply_temp
+      supply_humidity_pct: 48.0
+      fan_rpm: 1850.0
+      power_draw_kw: 12.5
+
+  - unit_id: crac-A2
+    hall_id: hall-A
+    manufacturer: Vertiv
+    model_number: PEX040
+    install_date: "2021-03-15"
+    max_cooling_kw: 40.0
+    baseline:
+      supply_temp_c: 18.2
+      delta_t_c: 9.5
+      supply_humidity_pct: 47.0
+      fan_rpm: 1800.0
+      power_draw_kw: 10.8
+
+  - unit_id: crac-B1
+    hall_id: hall-B
+    manufacturer: Stulz
+    model_number: CyberAir3
+    install_date: "2022-06-01"
+    max_cooling_kw: 60.0
+    baseline:
+      supply_temp_c: 17.8
+      delta_t_c: 10.5
+      supply_humidity_pct: 50.0
+      fan_rpm: 1920.0
+      power_draw_kw: 13.2
+
+  - unit_id: crac-B2
+    hall_id: hall-B
+    manufacturer: Liebert
+    model_number: DS060
+    install_date: "2022-06-01"
+    max_cooling_kw: 60.0
+    baseline:
+      supply_temp_c: 18.0
+      delta_t_c: 10.2
+      supply_humidity_pct: 49.0
+      fan_rpm: 1875.0
+      power_draw_kw: 12.8

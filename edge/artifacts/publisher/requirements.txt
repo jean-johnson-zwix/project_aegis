@@ -1,0 +1,6 @@
+# Edge component dependencies
+# Install with: pip install -r requirements.txt
+
+awsiotsdk>=1.21.0          # Greengrass IPC / MQTT proxy (Phase 2)
+pyyaml>=6.0.2              # CRAC unit + scenario config loading
+boto3>=1.35.0              # fallback AWS calls (Phase 1 test script only)
