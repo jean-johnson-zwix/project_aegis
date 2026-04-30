@@ -84,7 +84,7 @@ docker cp (Join-Path $EdgeDir 'recipe.yaml') `
 # ---------------------------------------------------------------------------
 $MergeJson = "{`"publishIntervalSeconds`":`"${PublishInterval}`""
 if ($Scenario) {
-    $MergeJson += ",`"ACTIVE_SCENARIO`":`"${Scenario}`""
+    $MergeJson += ",`"activeScenario`":`"${Scenario}`""
 }
 $MergeJson += '}'
 

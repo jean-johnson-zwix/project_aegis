@@ -27,6 +27,7 @@ ComponentConfiguration:
   DefaultConfiguration:
     publishIntervalSeconds: "60"
     bufferDbPath: /greengrass/v2/work/com.project-aegis.publisher/buffer.db
+    activeScenario: ""
     # cracUnits: loaded from crac_units.yaml artifact (co-located with publisher.py via CONFIG_DIR).
     # Using a YAML file rather than a flat config param supports nested unit attributes.
     # IPC access control — allows this component to publish to IoT Core via MQTT proxy
@@ -68,6 +69,7 @@ Manifests:
           export PUBLISH_INTERVAL_SECONDS={configuration:/publishIntervalSeconds}
           export BUFFER_DB_PATH={configuration:/bufferDbPath}
           export CONFIG_DIR={artifacts:path}
+          export ACTIVE_SCENARIO={configuration:/activeScenario}
           python3 -u {artifacts:path}/publisher.py
         RequiresPrivilege: false
 
