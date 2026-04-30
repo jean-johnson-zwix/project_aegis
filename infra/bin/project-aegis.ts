@@ -1,0 +1,23 @@
+#!/usr/bin/env node
+import 'source-map-support/register';
+import * as cdk from 'aws-cdk-lib';
+import { SiteWiseStack } from '../lib/sitewise-stack';
+import { IotStack } from '../lib/iot-stack';
+
+const app = new cdk.App();
+
+const env: cdk.Environment = {
+  account: process.env.CDK_DEFAULT_ACCOUNT,
+  region: process.env.CDK_DEFAULT_REGION ?? 'us-west-2',
+};
+
+const siteWiseStack = new SiteWiseStack(app, 'ProjectAegisSiteWiseStack', {
+  env,
+  description: 'Project Aegis — SiteWise asset models, assets, and hierarchy',
+});
+
+new IotStack(app, 'ProjectAegisIotStack', {
+  env,
+  description: 'Project Aegis — IoT Things and routing rule to SiteWise',
+  siteId: siteWiseStack.siteId,
+});

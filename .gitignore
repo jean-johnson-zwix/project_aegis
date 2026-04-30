@@ -216,3 +216,26 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# CDK
+cdk.out/
+infra/node_modules/
+infra/*.js
+infra/*.d.ts
+infra/bin/*.js
+infra/lib/*.js
+
+# IoT credentials — NEVER commit
+*.pem
+*.key
+*.crt
+*.p12
+edge/config/certs/
+
+# SQLite buffer
+buffer.db
+dead_letter.db
+
+# OS
+.DS_Store
+Thumbs.db
